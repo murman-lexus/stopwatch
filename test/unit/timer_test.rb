@@ -43,6 +43,22 @@ class TimerTest < ActiveSupport::TestCase
     assert_equal hours + 1, @time_entry.hours
    end
 
+  test "session duration remains separate from previously recorded hours across updates" do
+    @time_entry.update_column(:hours, 10.0)
+    @timer.start @time_entry
+    @data[:started_at] = 30.minutes.ago.to_i
+    @data[:session_started_at] = @data[:started_at]
+    @timer.update
+
+    restored = Stopwatch::Timer.new User.find(@user.id)
+    payload = JSON.parse(restored.to_json)
+    assert_equal restored.send(:data)[:session_started_at], @data[:session_started_at]
+    assert_operator @time_entry.reload.hours, :>=, 10.49
+    assert_equal Stopwatch::Timer::HourFormatter.new(0.5).format_hours, payload['session_time_spent']
+    restored.stop
+    assert_nil restored.send(:data)[:session_started_at]
+  end
+
   test "should save and restore" do
     hours = @time_entry.hours
     @timer.start @time_entry

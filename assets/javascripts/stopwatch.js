@@ -33,25 +33,82 @@ window.initStopwatch = function(config){
     document.title = s + match[2];
 
     // update menu item
-    match = menuItemRegexp.exec($('a#stopwatch-menu').text());
+    var menuItems = $('a[id="stopwatch-menu"]');
     if (spentTime){
       s = ' (' + spentTime + ')';
     } else {
       s = '';
     }
-    $('a#stopwatch-menu').text(match[1] + s);
+    menuItems.each(function() {
+      var item = $(this);
+      var label = item.data('stopwatchBaseLabel');
+      if (!label) {
+        var original = menuItemRegexp.exec(item.text());
+        label = original ? original[1] : item.text();
+        item.data('stopwatchBaseLabel', label);
+      }
+      item.text(label);
+    });
+  };
+
+  var updateActiveLink = function(data) {
+    if (!data || !data.running || !data.issue_id) {
+      $('.stopwatch-active-menu-item').remove();
+      return;
+    }
+    var menu = $('#top-menu');
+    if (!menu.length) return;
+    var existing = menu.children('.stopwatch-active-menu-item');
+    if (existing.length) {
+      existing.find('.stopwatch-active-trigger').text('⏱ ' + data.session_time_spent);
+      existing.find('.stopwatch-active-issue')
+        .attr('href', config.issueUrl.replace('/0', '/' + data.issue_id))
+        .text('#' + data.issue_id + (data.issue_subject ? ': ' + data.issue_subject : '') + ' · ' + data.session_time_spent);
+      existing.find('.stopwatch-active-stop').attr('href', config.stopUrl.replace('/0/', '/' + data.time_entry_id + '/') + '?context=1');
+      return;
+    }
+    var wrapper = $('<div>', {class: 'stopwatch-active-menu-item'});
+    var trigger = $('<button>', {
+      type: 'button', class: 'stopwatch-active-trigger',
+      'aria-label': locales.activeIssue, 'aria-expanded': 'false',
+      title: locales.activeIssue
+    }).text('⏱ ' + data.session_time_spent);
+    var panel = $('<div>', {class: 'stopwatch-active-panel'});
+    var issue = $('<a>', {
+      href: config.issueUrl.replace('/0', '/' + data.issue_id),
+      class: 'stopwatch-active-issue', title: locales.openIssue
+    }).text('#' + data.issue_id + (data.issue_subject ? ': ' + data.issue_subject : '') + ' · ' + data.session_time_spent);
+    var stop = $('<a>', {
+      href: config.stopUrl.replace('/0/', '/' + data.time_entry_id + '/') + '?context=1',
+      class: 'stopwatch-active-stop', 'data-remote': 'true', 'data-method': 'put', title: locales.stopTimer
+    }).text('■ ' + locales.stopTimer);
+    panel.append(issue, stop);
+    wrapper.append(trigger, panel);
+    trigger.on('click', function() {
+      var open = wrapper.toggleClass('is-open').hasClass('is-open');
+      trigger.attr('aria-expanded', String(open));
+    });
+    wrapper.on('keydown', function(event) {
+      if (event.key === 'Escape') {
+        wrapper.removeClass('is-open');
+        trigger.attr('aria-expanded', 'false').trigger('focus');
+      }
+    });
+    menu.append(wrapper);
   };
 
   var highlightRunningTimer = function(data){
     if (data && data.running && data.time_entry_id) {
       highlightTimer(data.time_entry_id, data.html_time_spent);
       updateSpentTime(data.time_entry_id, data.time_spent);
+      updateActiveLink(data);
       window.setTimeout(function(){
         fetchCurrentTimer(highlightRunningTimer);
       }, 60000);
     } else {
       highlightTimer();
       updateSpentTime();
+      updateActiveLink();
     }
   };
 

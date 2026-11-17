@@ -1,10 +1,14 @@
 <%= javascript_tag do %>
   window.stopwatch = window.initStopwatch({
     currentTimerUrl: '<%= j current_stopwatch_timers_url %>',
+    issueUrl: '<%= j issue_path(0) %>',
+    stopUrl: '<%= j stop_stopwatch_timer_path(0) %>',
     hourFormat: '<%= j format_hours 0.0 %>',
     locales: {
       startTimer: '<%= j l :label_stopwatch_start %>',
-      stopTimer: '<%= j l :label_stopwatch_stop %>'
+      stopTimer: '<%= j l :label_stopwatch_stop %>',
+      activeIssue: '<%= j t(:label_stopwatch_active_issue, default: 'Active task') %>',
+      openIssue: '<%= j t(:label_stopwatch_open_issue, default: 'Open issue') %>'
     },
   });
   <% if User.current.logged? %>

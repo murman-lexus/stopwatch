@@ -1,3 +1,96 @@
 tr.time-entry.running td.hours {
-  color: red;
+  color: #b91c1c !important;
+  font-weight: bold;
+}
+
+tr.time-entry.running td {
+  background-color: #fff1c2 !important;
+  color: #422006 !important;
+}
+
+/* Keep all time entries and their action buttons inside the Stopwatch dialog. */
+#ajax-modal table.stopwatch-entries {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+}
+
+#ajax-modal table.stopwatch-entries th,
+#ajax-modal table.stopwatch-entries td {
+  padding: 6px 4px !important;
+  overflow-wrap: anywhere;
+  white-space: normal !important;
+}
+
+#ajax-modal table.stopwatch-entries th:nth-child(1) { width: 17%; }
+#ajax-modal table.stopwatch-entries th:nth-child(2) { width: 31%; }
+#ajax-modal table.stopwatch-entries th:nth-child(3) { width: 18%; }
+#ajax-modal table.stopwatch-entries th:nth-child(4) { width: 14%; }
+#ajax-modal table.stopwatch-entries th:nth-child(5) { width: 20%; }
+
+#ajax-modal table.stopwatch-entries td.subject,
+#ajax-modal table.stopwatch-entries td.comments {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#ajax-modal table.stopwatch-entries td.buttons {
+  white-space: nowrap !important;
+}
+
+#top-menu:has(.stopwatch-active-menu-item) {
+  overflow: visible !important;
+}
+
+#top-menu .stopwatch-active-menu-item {
+  position: relative;
+  order: 2;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.stopwatch-active-trigger {
+  border: 0;
+  border-radius: 4px;
+  padding: 5px 9px;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.stopwatch-active-panel {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 1100;
+  min-width: 230px;
+  max-width: min(360px, 90vw);
+  padding: 6px;
+  border: 1px solid #d7dee7;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 4px 12px #0003;
+}
+
+.stopwatch-active-menu-item:hover .stopwatch-active-panel,
+.stopwatch-active-menu-item:focus-within .stopwatch-active-panel,
+.stopwatch-active-menu-item.is-open .stopwatch-active-panel {
+  display: block;
+}
+
+#top-menu .stopwatch-active-panel a {
+  display: block;
+  padding: 8px;
+  color: #263445 !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#top-menu .stopwatch-active-panel a:hover,
+#top-menu .stopwatch-active-panel a:focus {
+  background: #e8eef7;
 }
