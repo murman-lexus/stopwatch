@@ -33,6 +33,7 @@ module Stopwatch
     def start(time_entry = nil)
       fail "timer is already running" if running?
       data[:started_at] = Time.now.to_i
+      data[:session_started_at] = data[:started_at]
       data[:time_entry_id] = time_entry.id if time_entry
       save
     end
@@ -44,10 +45,13 @@ module Stopwatch
     # saves currently logged time to the time entry and resets the started_at
     # timestamp to either nil (stop: true) or current time.
     def update(stop: false)
+      # Preserve the start of this session while periodic updates persist hours.
+      data[:session_started_at] ||= data[:started_at] if running?
       if hours = runtime_hours and entry = self.time_entry
         time_entry.update_column :hours, entry.read_attribute(:hours) + hours
       end
       data[:started_at] = stop || !running? ? nil : Time.now.to_i
+      data[:session_started_at] = nil if stop
       save
     end
 
@@ -61,12 +65,16 @@ module Stopwatch
 
     def to_json
       formatter = HourFormatter.new(time_spent)
+      session_start = data[:session_started_at] || data[:started_at]
+      session_hours = running? && session_start ? [Time.now.to_i - session_start.to_i, 0].max.to_f / 1.hour : 0
       {
         time_entry_id: time_entry_id,
         time_spent: formatter.format_hours,
         html_time_spent: formatter.html_hours,
+        session_time_spent: HourFormatter.new(session_hours).format_hours,
         running: running?,
-        issue_id: time_entry&.issue_id
+        issue_id: time_entry&.issue_id,
+        issue_subject: time_entry&.issue&.visible?(user) ? time_entry.issue.subject : nil
       }.to_json
     end
 

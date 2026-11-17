@@ -1,0 +1,19 @@
+ru:
+  label_stopwatch_start: Начать отсчёт времени
+  label_stopwatch_stop: Остановить отсчёт времени
+  label_stopwatch_active_issue: Текущая задача
+  label_stopwatch_open_issue: Перейти к задаче
+  stopwatch:
+    settings:
+      label_always_ask: Всегда спрашивать
+      label_default_activity: Вид деятельности по умолчанию при запуске таймера
+      label_system: Использовать системное значение
+  stopwatch_timers:
+    entries_list:
+      button_stop: Остановить
+      button_resume: Продолжить
+    entry_form:
+      legend_new: Новая запись времени
+      legend_edit: Редактирование записи времени
+    edit:
+      button_save_and_continue: Сохранить и продолжить
